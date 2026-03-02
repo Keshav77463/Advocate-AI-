@@ -5,6 +5,8 @@ from qdrant_client.http.models import Distance, VectorParams
 import pandas as pd
 from langchain_community.document_loaders import TextLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
+from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_qdrant import QdrantVectorStore
 
 load_dotenv()
 
@@ -71,3 +73,20 @@ text_splitter = RecursiveCharacterTextSplitter(
 chunks = text_splitter.split_documents(bns_documents)
 
 print(f"Created {len(chunks)} chunks.")
+dense_embedding = HuggingFaceEmbeddings(
+    model_name="sentence-transformers/all-MiniLM-L6-v2"
+)
+
+qdrant = QdrantVectorStore(
+    client=client,
+    collection_name=collection_name,
+    embedding=dense_embedding,
+    vector_name="dense",
+)
+
+qdrant.add_documents(
+    documents=chunks,
+    batch_size=64,
+)
+
+print("Documents embedded and indexed successfully.")
