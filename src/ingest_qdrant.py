@@ -1,8 +1,7 @@
-# commit 1: Setup project configuration and Qdrant cloud connection
-
 import os
 from dotenv import load_dotenv
 from qdrant_client import QdrantClient
+from qdrant_client.http.models import Distance, VectorParams
 
 load_dotenv()
 
@@ -20,3 +19,19 @@ client = QdrantClient(
 )
 
 print("Qdrant connection established.")
+from qdrant_client.http.models import Distance, VectorParams
+
+if client.collection_exists(collection_name):
+    client.delete_collection(collection_name)
+
+client.create_collection(
+    collection_name=collection_name,
+    vectors_config={
+        "dense": VectorParams(
+            size=384,
+            distance=Distance.COSINE
+        )
+    }
+)
+
+print("Collection created successfully.")
