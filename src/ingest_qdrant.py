@@ -4,6 +4,7 @@ from qdrant_client import QdrantClient
 from qdrant_client.http.models import Distance, VectorParams
 import pandas as pd
 from langchain_community.document_loaders import TextLoader
+from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 load_dotenv()
 
@@ -61,3 +62,12 @@ for i in range(1, 359):
     bns_documents.append(docs[0])
 
 print("Documents loaded with metadata.")
+
+text_splitter = RecursiveCharacterTextSplitter(
+    chunk_size=chunk_size,
+    chunk_overlap=chunk_overlap,
+)
+
+chunks = text_splitter.split_documents(bns_documents)
+
+print(f"Created {len(chunks)} chunks.")
