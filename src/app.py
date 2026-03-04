@@ -6,6 +6,9 @@ import os
 from dotenv import load_dotenv
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.prompts import ChatPromptTemplate
+import qdrant_client.http.models as models
+import re
+
 
 st.set_page_config(page_title="Legal Assistant", page_icon="⚖️", layout="wide")
 
@@ -62,3 +65,17 @@ Answer:
 """
 
 prompt_template = ChatPromptTemplate.from_template(template)
+def extract_section_numbers(query):
+    return [int(n) for n in re.findall(r"\b(\d+)\b", query)]
+section_nums = extract_section_numbers(user_input)
+search_results = client.scroll(
+    collection_name="bns_sections",
+    scroll_filter=models.Filter(
+        must=[
+            models.FieldCondition(
+                key="metadata.sections",
+                match=models.MatchAny(section_nums)            )
+        ]
+    ),
+    limit=10,
+)
