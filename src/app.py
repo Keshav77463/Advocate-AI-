@@ -4,6 +4,8 @@ from qdrant_client import QdrantClient
 from langchain_community.embeddings import HuggingFaceEmbeddings
 import os
 from dotenv import load_dotenv
+from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_core.prompts import ChatPromptTemplate
 
 st.set_page_config(page_title="Legal Assistant", page_icon="⚖️", layout="wide")
 
@@ -42,3 +44,21 @@ if user_input:
         embedding=dense_embedding,
         vector_name="dense",
     )
+llm = ChatGoogleGenerativeAI(
+    model="gemini-2.5-flash",
+    temperature=0
+)
+
+template = """
+Use the provided context to answer the question.
+
+Context:
+{context}
+
+Question:
+{question}
+
+Answer:
+"""
+
+prompt_template = ChatPromptTemplate.from_template(template)
