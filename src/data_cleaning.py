@@ -1,8 +1,18 @@
 import re
+
 def clean_bns_page_content(text: str) -> str:
+    # Keep only text after "Description"
+    if "Description" in text:
+        text = text.split("Description", 1)[1]
+
     # Remove navigation noise
     text = re.sub(r'(Top|Prev|Index|Next)\s*', '', text)
     text = re.sub(r'No Javascript.*?Reload this page!', '', text, flags=re.DOTALL)
+
+    # Remove header noise
+    text = re.sub(r'\b(Home|Messages|BNS)\b', '', text)
+    text = re.sub(r'Chapter\s+[IVXLC]+', '', text)
+    text = re.sub(r'S\.\s*\d+', '', text)
 
     # Remove footer/attribution
     text = re.sub(r'©.*', '', text, flags=re.DOTALL)
